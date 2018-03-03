@@ -1,0 +1,3 @@
+com/empresa/monitoraLog/Application.class
+com/empresa/monitoraLog/domain/StackTrace.class
+com/empresa/monitoraLog/WebsphereLogSplitter.class

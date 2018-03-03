@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:int="http://www.springframework.org/schema/integration"
+  xmlns:int-file="http://www.springframework.org/schema/integration/file"
+  xmlns:int-http="http://www.springframework.org/schema/integration/http"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans
+    http://www.springframework.org/schema/beans/spring-beans.xsd
+    http://www.springframework.org/schema/integration
+    http://www.springframework.org/schema/integration/spring-integration.xsd
+    http://www.springframework.org/schema/integration/file
+    http://www.springframework.org/schema/integration/file/spring-integration-file.xsd
+    http://www.springframework.org/schema/integration/http
+    http://www.springframework.org/schema/integration/http/spring-integration-http.xsd">
+
+
+      
+<int-file:inbound-channel-adapter id="inChannel"
+	                              directory="/home/ique/Desenvolvimento e Pesquisas/textfiles/logs websphere/20171201/SiafNet1/"
+	                              filename-pattern="SystemErr.log">
+	    <int:poller id="poller" fixed-rate="10000"/>
+</int-file:inbound-channel-adapter>	
+
+
+
+<int:splitter id="wsLogSpllitter"
+				input-channel="inChannel"
+                output-channel="outChannel">
+                <bean class="com.empresa.monitoraLog.WebsphereLogSplitter"/>
+</int:splitter>
+
+
+
+<int:channel id="outChannel"/>
+
+
+
+
+<int:object-to-json-transformer id="objectToJsonTransformer" input-channel="outChannel" content-type="application/json;charset=utf-8"
+								output-channel="outboundChannel"  >
+</int:object-to-json-transformer>
+
+								
+								
+<int:channel id="outboundChannel"/>
+
+
+
+<int:gateway id="requestGateway" 
+             service-interface="com.empresa.monitoraLog.RequestGateway"
+             default-request-channel="outboundChannel" >
+			<!-- <int:default-header name="content-type" value="application/json;charset=utf-8" /> --> 
+</int:gateway>
+
+
+
+<int-http:outbound-gateway request-channel="outboundChannel"
+							url="http://localhost:8080/trace" 
+							http-method="POST"
+							reply-channel="replyChannel"
+							expected-response-type="java.lang.String">
+</int-http:outbound-gateway>
+
+
+
+<int:logging-channel-adapter id="replyChannel" level="INFO"  />
+
+
+    
+</beans>    
