@@ -49,7 +49,6 @@ public class WebsphereLogSplitter {
 						createMessage();
 						clearStackTrace();
 						appendLineToStackTrace(line + "\n");
-						
 					
 					}else { 
 						appendLineToStackTrace(line + "\n");
@@ -74,7 +73,6 @@ public class WebsphereLogSplitter {
 	}
 	
 	
-	
 
 	private void appendLineToStackTrace(String newTextFragment) {
 		
@@ -83,8 +81,7 @@ public class WebsphereLogSplitter {
 		
 	}
 	
-	
-	
+		
 	
 	private void clearStackTrace() {
 		stackTrace = "";
@@ -92,16 +89,9 @@ public class WebsphereLogSplitter {
 	
 	
 	
-	public void createMessage() throws UnknownHostException{
+	public void createMessage() throws Exception{
 		
-		StackTrace trace = new StackTrace();
-		
-		trace.setStackTrace(stackTrace);
-		trace.setApplicationName("AppTeste");
-		trace.setDate();
-		trace.setServerAddress(InetAddress.getLocalHost().toString());
-
-		
+		StackTrace trace = new StackTrace(stackTrace);
 		messages.add(new GenericMessage<StackTrace>(trace));
 
 	}
