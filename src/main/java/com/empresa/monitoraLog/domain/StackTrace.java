@@ -76,16 +76,9 @@ public class StackTrace {
 						
 						else
 							strMsgExcption = strMsgExcption + linhaSplit[i] + ":";
-							
 						
 					}
-					this.setExceptionMessage(strMsgExcption);
-					System.out.println("*************************************************");
-					System.out.println("*************************************************");
-					System.out.println("*************************************************");
-					System.out.println(strMsgExcption);
-
-
+					
 					break;
 				}
 			}
@@ -101,7 +94,6 @@ public class StackTrace {
 			 * EX.: br.gov.sp.
 			 */
 			if (linha.matches(".*\\sat\\s{1}" + prefixoDoPacote + "\\w.*")){
-				
 				
 				/*
 				 * ISOLA A STRING QUE CONTÉM APENAS O pacote.classe.metodo
@@ -137,7 +129,6 @@ public class StackTrace {
 					
 					this.setExceptionPackage(prefixoDoPacote+sufixoPacote);
 					
-					
 					/*
 					 * ISOLA A STRING QUE CONTÉM APENAS O NOME DO ARQUIVO:NUMERO DA LINHA
 					 * EX.: ProducaoSIAFEMLogin.java:77
@@ -150,28 +141,16 @@ public class StackTrace {
 						this.setExceptionLine(numeroDaLinha[1]);
 					}
 					
-					System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>*");
-					System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-					System.out.println("linha : " + linha);
-					System.out.println("Pacote: " + this.getExceptionPackage());
-					System.out.println("Classe: " + this.getExceptionClass());
-					System.out.println("Metodo: " + this.getExceptionMethod());
-					System.out.println("Linha : " + this.getExceptionLine());
-
 				    break;
 				}
 			}
 		}
-
-		
-		
 	}
 	
 	
 	private void setLinhasDoStackTrace (String stackTrace) {
 		linhasDoStackTrace = stackTrace.split(System.getProperty("line.separator"));
 	}
-	
 	
 	
 	private void setDate() throws Exception {
@@ -189,7 +168,6 @@ public class StackTrace {
 		return date;
 	}
 
-	
 	public String getServerAddress() {
 		return serverAddress;
 	}
@@ -213,7 +191,6 @@ public class StackTrace {
 	public void setStackTrace(String stackTrace) {
 		this.stackTrace = stackTrace;
 	}
-	
 	
 	public String getExceptionType() {
 		return exceptionType;
@@ -269,7 +246,15 @@ public class StackTrace {
 
 	@Override
 	public String toString() {
-		return "\n[STACKTRACE][date:" + this.getDate() + "][serverAddress:" + this.getServerAddress() + "][appName:" + this.getApplicationName();
+		return "\n[STACKTRACE][data:" 		+ this.getDate() 
+					+ "][servidor:" 		+ this.getServerAddress() 
+					+ "][NomeApp:" 			+ this.getApplicationName()
+					+ "][Tipo Excecao:" 	+ this.getExceptionType()
+					+ "][Mensagem Erro:" 	+ this.getExceptionMessage()
+					+ "][Pacote:" 			+ this.getExceptionPackage()
+					+ "][Classe:" 			+ this.getExceptionClass()
+					+ "][Metodo:" 			+ this.getExceptionMethod()
+					+ "][Linha:" 			+ this.getExceptionLine();
 		
 	}
 	

@@ -14,7 +14,7 @@ public class DataUtil {
 		
 		ano = "20" + ano;
 		
-		SimpleDateFormat sdfIn = new SimpleDateFormat("dd/MM/yy HH:mm:ss");
+		SimpleDateFormat sdfIn = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 		Date novaData = new Date(sdfIn.parse(diaMes+ano+espacoMaisHora).getTime());
 		return novaData;
 
