@@ -1,57 +1,87 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xmlns:int="http://www.springframework.org/schema/integration"
-  xmlns:int-file="http://www.springframework.org/schema/integration/file"
-  xmlns:int-http="http://www.springframework.org/schema/integration/http"
-  xsi:schemaLocation="http://www.springframework.org/schema/beans
-    http://www.springframework.org/schema/beans/spring-beans.xsd
-    http://www.springframework.org/schema/integration
-    http://www.springframework.org/schema/integration/spring-integration.xsd
-    http://www.springframework.org/schema/integration/file
-    http://www.springframework.org/schema/integration/file/spring-integration-file.xsd
-    http://www.springframework.org/schema/integration/http
-    http://www.springframework.org/schema/integration/http/spring-integration-http.xsd">
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:int-file="http://www.springframework.org/schema/integration/file"
+	xmlns:task="http://www.springframework.org/schema/task"
+	xmlns:int="http://www.springframework.org/schema/integration"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:int-http="http://www.springframework.org/schema/integration/http"
+	xsi:schemaLocation="http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd
+		http://www.springframework.org/schema/integration/file http://www.springframework.org/schema/integration/file/spring-integration-file.xsd
+		http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/integration/http http://www.springframework.org/schema/integration/http/spring-integration-http.xsd">    
 
 
-      
-<int-file:inbound-channel-adapter id="inChannel"
-	                              directory="/home/ique/Desenvolvimento e Pesquisas/textfiles/logs websphere/20171201/SiafNet1/"
-	                              filename-pattern="SystemErr.log">
-	    <int:poller id="poller" fixed-rate="10000"/>
-</int-file:inbound-channel-adapter>	
+<context:property-placeholder location="classpath:application.properties" />
+
+<int-file:tail-inbound-channel-adapter id="apache"
+		channel="inChannel"
+		task-executor="exec"
+		file="${client.log.location}"
+		delay="1000"
+		end="true"
+		reopen="true"
+		file-delay="10000"
+		/>
+		 
+		 
+<int:channel id="inChannel">
+<int:queue/>
+</int:channel>		
 
 
+<task:executor id="exec" pool-size="10"/>
+
+
+<int:aggregator id="aggregator"
+				input-channel="inChannel"
+    			output-channel="aggregatorOutputChannel"
+				method="aggregate"
+				correlation-strategy-method="getCorrelationKey"
+				release-strategy-method="canRelease"
+				expire-groups-upon-timeout="true"
+				send-partial-result-on-expiry="true"
+				group-timeout="1000">
+				<int:poller fixed-delay="1000" />
+			<bean id="aggregatorBean" class="com.empresa.monitoraLog.LogAggregator"/>
+</int:aggregator>
+
+
+<int:channel id="aggregatorOutputChannel">
+ <int:queue />
+</int:channel>
 
 <int:splitter id="wsLogSpllitter"
-				input-channel="inChannel"
-                output-channel="outChannel">
-                <bean class="com.empresa.monitoraLog.WebsphereLogSplitter"/>
+				input-channel="aggregatorOutputChannel"
+                output-channel="splitterOutputChannel"
+                method="split">
+                <int:poller fixed-delay="1000" />
+                <bean class="com.empresa.monitoraLog.LogSplitter"/>
 </int:splitter>
 
 
-
-<int:channel id="outChannel"/>
-
+<int:channel id="splitterOutputChannel"/>
 
 
-
-<int:object-to-json-transformer id="objectToJsonTransformer" input-channel="outChannel" content-type="application/json;charset=utf-8"
+<int:object-to-json-transformer id="objectToJsonTransformer" 
+								input-channel="splitterOutputChannel" 
+								content-type="application/json;charset=utf-8"
 								output-channel="outboundChannel"  >
 </int:object-to-json-transformer>
 
 								
-								
 <int:channel id="outboundChannel"/>
-
 
 
 <int:gateway id="requestGateway" 
              service-interface="com.empresa.monitoraLog.RequestGateway"
              default-request-channel="outboundChannel" >
-			<!-- <int:default-header name="content-type" value="application/json;charset=utf-8" /> --> 
+             <int:default-header name="content-type" value="application/json;charset=utf-8" />
 </int:gateway>
-
 
 
 <int-http:outbound-gateway request-channel="outboundChannel"
@@ -62,9 +92,7 @@
 </int-http:outbound-gateway>
 
 
-
 <int:logging-channel-adapter id="replyChannel" level="INFO"  />
 
 
-    
 </beans>    

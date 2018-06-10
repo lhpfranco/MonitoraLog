@@ -1,0 +1,2 @@
+[29/11/17 14:26:12:985 BRST] 00000099 SystemErr     R com.wrq.apptrieve.agent.ChannelException: Connection is not established
+[29/11/17 14:26:12:985 BRST] 00000099 SystemErr     R 	at com.wrq.apptrieve.agent.RemoteHostChannel.execRemoteCommand(RemoteHostChannel.java:640)

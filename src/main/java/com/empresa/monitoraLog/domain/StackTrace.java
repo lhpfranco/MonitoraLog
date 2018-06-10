@@ -1,43 +1,48 @@
 package com.empresa.monitoraLog.domain;
 
-import java.net.InetAddress;
+import java.io.Serializable;
 import java.sql.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.empresa.monitoraLog.util.DataUtil;
+import com.empresa.monitoraLog.util.DateUtil;
 
-public class StackTrace {
+import lombok.Getter;
+import lombok.Setter;
+
+
+public class StackTrace implements Serializable {
 	
-	private Date   date;
-	private String serverAddress;
-	private String applicationName;
-	private String stackTrace;
-	private String exceptionType;
-	private String exceptionMessage;
-	private String exceptionPackage;
-	private String exceptionClass;
-	private String exceptionMethod;
-	private String exceptionLine;
+	private static final long serialVersionUID = 1L;
 	
-	private String linhasDoStackTrace[];
+	private @Getter Date date;
+	private @Getter @Setter String serverAddress;
+	private @Getter @Setter String applicationName;
+	private @Getter @Setter String stackTrace;
+	private @Getter @Setter String exceptionType;
+	private @Getter @Setter String exceptionMessage;
+	private @Getter @Setter String exceptionPackage;
+	private @Getter @Setter String exceptionClass;
+	private @Getter @Setter String exceptionMethod;
+	private @Getter @Setter String exceptionLine;
 	
-	public StackTrace(String stackTrace) throws Exception {
-		this.setStackTrace(stackTrace);
-		this.setApplicationName("AppTeste");
-		this.setDate();
-		this.setServerAddress(InetAddress.getLocalHost().toString());
-		this.setLinhasDoStackTrace(this.getStackTrace());
-		this.setExceptionTypeFromStackTrace();
-		this.setExceptionMessageFromStackTrace();
-		this.setExceptionFileInfoFromStackTrace("br.gov.sp.");
+	private @Getter String linhasDoStackTrace[];
+	
+	public StackTrace(String serverAddress, String applicationName, String packageNaming, String stackTrace) throws Exception {
+		setAllPossibleNullToEmpty();
+		setDate(stackTrace);
+		setServerAddress(serverAddress);
+		setApplicationName(applicationName);
+		setStackTrace(stackTrace);
+		setLinhasDoStackTrace(getStackTrace());
+		setExceptionTypeFromStackTrace(linhasDoStackTrace);
+		setExceptionMessageFromStackTrace(linhasDoStackTrace);
+		setExceptionClassInfoFromStackTrace(packageNaming);
 	}
 	
 	
-	
-	private void setExceptionTypeFromStackTrace() {
-		
-		for (String linha : linhasDoStackTrace) {
+	private void setExceptionTypeFromStackTrace(String linhasDoTrace[]) {
+		for (String linha : linhasDoTrace) {
 			if (linha.matches(".*\\sR\\s{1}\\w.*")){
 				Pattern pattern = Pattern.compile("(?<=R\\s{1})(.*?)(?=:)");
 
@@ -52,13 +57,13 @@ public class StackTrace {
 	}
 	
 
-	private void setExceptionMessageFromStackTrace() {
+	private void setExceptionMessageFromStackTrace(String linhasDoTrace[]) {
 		/*
 		 * PADRÃO DE RECONHECIMENTO: MENSAGEM DE EXCEPTION
-		 * PRIMEIRA LINHA DO TRACE, APÓS, QUINTO CARACTER DOIS PONTOS ':'
+		 * PRIMEIRA LINHA DO TRACE, APÓS O QUINTO CARACTER DOIS PONTOS ':'
 		 * 
 		 */
-		for (String linha : linhasDoStackTrace) {
+		for (String linha : linhasDoTrace) {
 			if (linha.matches(".*\\sR\\s{1}\\w.*")){
 				String linhaSplit[] = linha.split(":");
 				if(linhaSplit.length == 5) {
@@ -78,15 +83,17 @@ public class StackTrace {
 							strMsgExcption = strMsgExcption + linhaSplit[i] + ":";
 						
 					}
-					
+					this.setExceptionMessage(linhaSplit[linhaSplit.length-1]);
 					break;
 				}
 			}
 		}
+		if(getExceptionMessage() != null && !getExceptionMessage().equals(""))
+			setExceptionMessage(getExceptionMessage().trim());
 	}
 	
 		
-	private void setExceptionFileInfoFromStackTrace(String prefixoDoPacote) {
+	private void setExceptionClassInfoFromStackTrace(String prefixoDoPacote) {
 		for (String linha : linhasDoStackTrace) {
 			
 			/*
@@ -107,7 +114,7 @@ public class StackTrace {
 					String localizacaoDaException[] = matcher.group(1).split("\\.");
 					
 					/*
-					 * O MÉTODO É O VALOR DA ÚLTIMA POSICAO DENTRO DO PADRAO DE LOG
+					 * O MÉTODO ONDE A EXCEPTION OCORREU É O VALOR DA ÚLTIMA POSICAO DENTRO DO PADRAO DE LOG
 					 */
 					this.setExceptionMethod(localizacaoDaException[localizacaoDaException.length-1]);
 					
@@ -153,109 +160,37 @@ public class StackTrace {
 	}
 	
 	
-	private void setDate() throws Exception {
-		
-		if(this.stackTrace != null && !this.stackTrace.equals("")) {
-			DataUtil dataUtil = new DataUtil();
-			if(this.stackTrace.length() > 23)
-				this.date = dataUtil.converteStringMilisegundosToDate(this.stackTrace.substring(1, 22));
+	private void setDate(String trace) throws Exception {
+		if(trace != null && !trace.equals("")) {
+			DateUtil dataUtil = new DateUtil();
+			if(trace.length() > 23)
+				this.date = dataUtil.converteStringMilisegundosToDate(trace.substring(1, 22));
 			
 		}
 	}
 	
 	
-	public Date getDate() {
-		return date;
-	}
-
-	public String getServerAddress() {
-		return serverAddress;
-	}
-	
-	public void setServerAddress(String serverAddress) {
-		this.serverAddress = serverAddress;
+	private void setAllPossibleNullToEmpty() {
+		setExceptionPackage("");
+		setExceptionClass("");
+		setExceptionMethod("");
+		setExceptionLine("");
 	}
 	
-	public String getApplicationName() {
-		return applicationName;
-	}
 	
-	public void setApplicationName(String applicationName) {
-		this.applicationName = applicationName;
-	}
-	
-	public String getStackTrace() {
-		return stackTrace;
-	}
-	
-	public void setStackTrace(String stackTrace) {
-		this.stackTrace = stackTrace;
-	}
-	
-	public String getExceptionType() {
-		return exceptionType;
-	}
-
-	public void setExceptionType(String exceptionType) {
-		this.exceptionType = exceptionType;
-	}
-	
-	public String getExceptionMessage() {
-		return exceptionMessage;
-	}
-
-	public void setExceptionMessage(String message) {
-		this.exceptionMessage = message;
-	}
-
-	public String getExceptionPackage() {
-		return exceptionPackage;
-	}
-
-	public void setExceptionPackage(String _package) {
-		this.exceptionPackage = _package;
-	}
-
-	public String getExceptionClass() {
-		return exceptionClass;
-	}
-
-	public void setExceptionClass(String _class) {
-		this.exceptionClass = _class;
-	}
-
-	public String getExceptionMethod() {
-		return exceptionMethod;
-	}
-
-	public void setExceptionMethod(String method) {
-		this.exceptionMethod = method;
-	}
-
-	public String getExceptionLine() {
-		return exceptionLine;
-	}
-
-	public void setExceptionLine(String line) {
-		this.exceptionLine = line;
-	}
-
-	public void setDate(Date date) {
-		this.date = date;
-	}
-
 	@Override
 	public String toString() {
-		return "\n[STACKTRACE][data:" 		+ this.getDate() 
-					+ "][servidor:" 		+ this.getServerAddress() 
-					+ "][NomeApp:" 			+ this.getApplicationName()
-					+ "][Tipo Excecao:" 	+ this.getExceptionType()
-					+ "][Mensagem Erro:" 	+ this.getExceptionMessage()
-					+ "][Pacote:" 			+ this.getExceptionPackage()
-					+ "][Classe:" 			+ this.getExceptionClass()
-					+ "][Metodo:" 			+ this.getExceptionMethod()
-					+ "][Linha:" 			+ this.getExceptionLine();
-		
+		return "\n[STACKTRACE]"
+					+"\n[data:" 				+ this.getDate() 
+					+ "]\n[servidor:" 			+ this.getServerAddress() 
+					+ "]\n[NomeApp:" 			+ this.getApplicationName()
+					+ "]\n[Tipo Excecao:" 		+ this.getExceptionType()
+					+ "]\n[Mensagem Erro:" 		+ this.getExceptionMessage()
+					+ "]\n[Pacote:" 			+ this.getExceptionPackage()
+					+ "]\n[Classe:" 			+ this.getExceptionClass()
+					+ "]\n[Metodo:" 			+ this.getExceptionMethod()
+					+ "]\n[Linha:" 				+ this.getExceptionLine()
+					+ "]\n";
 	}
 	
 }

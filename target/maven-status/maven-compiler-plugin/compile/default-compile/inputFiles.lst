@@ -1,4 +1,9 @@
 /home/ique/git/MonitoraLog/src/main/java/com/empresa/monitoraLog/WebsphereLogSplitter.java
+/home/ique/git/MonitoraLog/src/main/java/com/empresa/monitoraLog/util/LogUtil.java
+/home/ique/git/MonitoraLog/src/main/java/com/empresa/monitoraLog/LogSplitter.java
+/home/ique/git/MonitoraLog/src/main/java/com/empresa/monitoraLog/LogAggregator.java
+/home/ique/git/MonitoraLog/src/main/java/com/empresa/monitoraLog/TailFiles.java
+/home/ique/git/MonitoraLog/src/main/java/com/empresa/monitoraLog/util/DataUtil.java
 /home/ique/git/MonitoraLog/src/main/java/com/empresa/monitoraLog/RequestGateway.java
 /home/ique/git/MonitoraLog/src/main/java/com/empresa/monitoraLog/domain/StackTrace.java
 /home/ique/git/MonitoraLog/src/main/java/com/empresa/monitoraLog/Application.java

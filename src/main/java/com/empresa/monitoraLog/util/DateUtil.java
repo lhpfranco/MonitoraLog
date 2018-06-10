@@ -3,7 +3,7 @@ package com.empresa.monitoraLog.util;
 import java.text.SimpleDateFormat;
 import java.sql.Date;
 
-public class DataUtil {
+public class DateUtil {
 
 	
 	public Date converteStringMilisegundosToDate(String inDataString) throws Exception{

@@ -8,6 +8,7 @@ import org.springframework.context.annotation.ImportResource;
 @SpringBootApplication
 @ImportResource("websphereLog.xml")
 public class Application {
+	
     public static void main(String[] args) throws Exception {
         ConfigurableApplicationContext ctx = new SpringApplication(Application.class).run(args);
         System.out.println("Hit Enter to terminate");

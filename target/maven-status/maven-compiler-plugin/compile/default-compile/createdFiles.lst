@@ -1,3 +1,9 @@
+com/empresa/monitoraLog/RequestGateway.class
+com/empresa/monitoraLog/LogSplitter.class
+com/empresa/monitoraLog/util/LogUtil.class
+com/empresa/monitoraLog/TailFiles.class
+com/empresa/monitoraLog/util/DataUtil.class
 com/empresa/monitoraLog/Application.class
 com/empresa/monitoraLog/domain/StackTrace.class
+com/empresa/monitoraLog/LogAggregator.class
 com/empresa/monitoraLog/WebsphereLogSplitter.class
